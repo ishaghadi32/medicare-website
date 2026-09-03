@@ -12,6 +12,9 @@ function Patient() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // =========================
+  // LOGIN
+  // =========================
   const handleLogin = (e) => {
     e.preventDefault();
 
@@ -21,18 +24,22 @@ function Patient() {
     }
 
     localStorage.setItem("patientEmail", email);
-
     setIsLoggedIn(true);
   };
 
+  // =========================
+  // LOGOUT
+  // =========================
   const handleLogout = () => {
     localStorage.removeItem("patientEmail");
-
     setAppointments([]);
     setIsLoggedIn(false);
     setEmail("");
   };
 
+  // =========================
+  // FETCH APPOINTMENTS
+  // =========================
   const fetchAppointments = async () => {
     try {
       setLoading(true);
@@ -40,26 +47,37 @@ function Patient() {
       const patientEmail = localStorage.getItem("patientEmail");
 
       const response = await fetch(
-        `https://medicare-website-vzf1.onrender.com/patient/appointments/${patientEmail}`
+        `https://medicare-website-vzf1.onrender.com/patient/appointments/${encodeURIComponent(patientEmail)}`
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appointments");
+      }
 
       const data = await response.json();
 
-      setAppointments(data);
+      setAppointments(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error(error);
+      console.error("Error:", error);
       alert("Failed to load appointments");
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // =========================
+  // LOAD APPOINTMENTS
+  // =========================
   useEffect(() => {
     if (!isLoggedIn) return;
 
     fetchAppointments();
   }, [isLoggedIn]);
 
+  // =========================
+  // LOGIN PAGE
+  // =========================
   if (!isLoggedIn) {
     return (
       <div style={{ padding: "40px" }}>
@@ -71,33 +89,31 @@ function Patient() {
             placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
 
           <br />
           <br />
 
-          <button type="submit">
-            Login
-          </button>
+          <button type="submit">Login</button>
         </form>
       </div>
     );
   }
 
+  // =========================
+  // PATIENT DASHBOARD
+  // =========================
   return (
     <div style={{ padding: "40px" }}>
       <h1>Patient Dashboard</h1>
 
-      <button onClick={handleLogout}>
-        Logout
-      </button>
+      <button onClick={handleLogout}>Logout</button>
 
       <br />
       <br />
 
-      <h2>
-        My Appointments: {appointments.length}
-      </h2>
+      <h2>My Appointments: {appointments.length}</h2>
 
       {loading ? (
         <p>Loading...</p>
@@ -123,9 +139,7 @@ function Patient() {
           <tbody>
             {appointments.length === 0 ? (
               <tr>
-                <td colSpan="5">
-                  No appointments found.
-                </td>
+                <td colSpan="5">No appointments found.</td>
               </tr>
             ) : (
               appointments.map((appointment) => (
@@ -133,8 +147,8 @@ function Patient() {
                   <td>{appointment.doctor}</td>
                   <td>{appointment.date}</td>
                   <td>{appointment.time}</td>
-                  <td>{appointment.message}</td>
-                  <td>{appointment.status}</td>
+                  <td>{appointment.message || "—"}</td>
+                  <td>{appointment.status || "Pending"}</td>
                 </tr>
               ))
             )}
