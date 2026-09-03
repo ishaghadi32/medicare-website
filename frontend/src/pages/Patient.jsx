@@ -54,7 +54,7 @@ function Patient() {
         );
 
       const response = await fetch(
-        `http://localhost:5000/patient/appointments/${patientEmail}`
+       https://medicare-website-vzf1.onrender.com/patient/appointments/${patientEmail}`
       );
 
       const data = await response.json();

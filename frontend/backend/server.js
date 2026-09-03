@@ -77,43 +77,13 @@ app.post("/admin/login", (req, res) => {
 // =========================
 // DOCTOR LOGIN
 // =========================
+// =========================
+// DOCTOR LOGIN
+// =========================
 
 app.post("/doctor/login", (req, res) => {
-  app.post("/patient/login", async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const patient = await appointmentsCollection.findOne({
-      email,
-    });
-
-    if (!patient) {
-      return res.status(401).json({
-        message: "Patient not found",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        email,
-        role: "patient",
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "2h",
-      }
-    );
-
-    res.json({
-      token,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Login failed",
-    });
-  }
-});
   console.log("LOGIN REQUEST:", req.body);
+
   const { username, password } = req.body;
 
   const doctors = [
