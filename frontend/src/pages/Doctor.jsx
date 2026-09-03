@@ -16,9 +16,18 @@ function Doctor() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/doctor/login",
-        {
-          method: "POST",
+  "https://medicare-website-vzf1.onrender.com/doctor/login",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  }
+);
           headers: {
             "Content-Type": "application/json",
           },
@@ -63,8 +72,8 @@ function Doctor() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        "http://localhost:5000/doctor/appointments",
+     const response = await fetch(
+  "https://medicare-website-vzf1.onrender.com/doctor/appointments",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(
