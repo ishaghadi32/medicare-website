@@ -20,41 +20,27 @@ function Patient() {
       return;
     }
 
-    localStorage.setItem(
-      "patientEmail",
-      email
-    );
+    localStorage.setItem("patientEmail", email);
 
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem(
-      "patientEmail"
-    );
+    localStorage.removeItem("patientEmail");
 
     setAppointments([]);
     setIsLoggedIn(false);
     setEmail("");
   };
 
-  useEffect(() => {
-    if (!isLoggedIn) return;
-
-    fetchAppointments();
-  }, [isLoggedIn]);
-
   const fetchAppointments = async () => {
     try {
       setLoading(true);
 
-      const patientEmail =
-        localStorage.getItem(
-          "patientEmail"
-        );
+      const patientEmail = localStorage.getItem("patientEmail");
 
       const response = await fetch(
-       https://medicare-website-vzf1.onrender.com/patient/appointments/${patientEmail}`
+        `https://medicare-website-vzf1.onrender.com/patient/appointments/${patientEmail}`
       );
 
       const data = await response.json();
@@ -68,6 +54,12 @@ function Patient() {
     }
   };
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    fetchAppointments();
+  }, [isLoggedIn]);
+
   if (!isLoggedIn) {
     return (
       <div style={{ padding: "40px" }}>
@@ -78,9 +70,7 @@ function Patient() {
             type="email"
             placeholder="Enter Email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <br />
@@ -106,8 +96,7 @@ function Patient() {
       <br />
 
       <h2>
-        My Appointments:{" "}
-        {appointments.length}
+        My Appointments: {appointments.length}
       </h2>
 
       {loading ? (
@@ -132,23 +121,23 @@ function Patient() {
           </thead>
 
           <tbody>
-             {appointments.length === 0 ? (
-    <tr>
-      <td colSpan="5">
-        No appointments found.
-      </td>
-    </tr>
-  ) : (
-    appointments.map((appointment) => (
-      <tr key={appointment._id}>
-        <td>{appointment.doctor}</td>
-        <td>{appointment.date}</td>
-        <td>{appointment.time}</td>
-        <td>{appointment.message}</td>
-        <td>{appointment.status}</td>
-      </tr>
-    ))
-  )}
+            {appointments.length === 0 ? (
+              <tr>
+                <td colSpan="5">
+                  No appointments found.
+                </td>
+              </tr>
+            ) : (
+              appointments.map((appointment) => (
+                <tr key={appointment._id}>
+                  <td>{appointment.doctor}</td>
+                  <td>{appointment.date}</td>
+                  <td>{appointment.time}</td>
+                  <td>{appointment.message}</td>
+                  <td>{appointment.status}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       )}

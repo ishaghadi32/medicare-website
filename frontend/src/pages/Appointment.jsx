@@ -18,7 +18,7 @@ function Appointment() {
 
     try {
       const response = await fetch(
-        https://medicare-website-vzf1.onrender.com/appointments",
+        "https://medicare-website-vzf1.onrender.com/appointments",
         {
           method: "POST",
           headers: {

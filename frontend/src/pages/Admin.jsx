@@ -6,102 +6,101 @@ function Admin() {
   const [error, setError] = useState("");
 
   // =========================
+  // FETCH APPOINTMENTS
   // =========================
-// FETCH APPOINTMENTS
-// =========================
+  const fetchAppointments = async () => {
+    console.log("FETCH APPOINTMENTS CALLED");
 
-const fetchAppointments = async () => {
-  console.log("FETCH APPOINTMENTS CALLED");
+    try {
+      setLoading(true);
+      setError("");
 
-  try {
-    setLoading(true);
-    setError("");
+      const token = localStorage.getItem("adminToken");
 
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    const response = await fetch(
-      "https://medicare-website-vzf1.onrender.com/appointments",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      if (!token) {
+        setLoading(false);
+        return;
       }
-    );
 
-    console.log("STATUS:", response.status);
-
-    if (response.status === 401) {
-      localStorage.removeItem("adminToken");
-      window.location.href = "/admin";
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch appointments");
-    }
-
-    const data = await response.json();
-
-    console.log("DATA:", data);
-
-    setAppointments(data);
-  } catch (error) {
-    console.error("Error:", error);
-    setError("Could not load appointments.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-// =========================
-// UPDATE STATUS
-// =========================
-
-const updateStatus = async (id, status) => {
-  try {
-    const token = localStorage.getItem("adminToken");
-
-    const response = await fetch(
-      "https://medicare-website-vzf1.onrender.com/appointments/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to update appointment"
+      const response = await fetch(
+        "https://medicare-website-vzf1.onrender.com/appointments",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
+      console.log("STATUS:", response.status);
+
+      if (response.status === 401) {
+        localStorage.removeItem("adminToken");
+        window.location.href = "/admin";
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appointments");
+      }
+
+      const data = await response.json();
+
+      console.log("DATA:", data);
+
+      setAppointments(data);
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Could not load appointments.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setAppointments((currentAppointments) =>
-      currentAppointments.map((appointment) =>
-        appointment._id === id
-          ? { ...appointment, status }
-          : appointment
-      )
-    );
-  } catch (error) {
-    console.error("Status update error:", error);
-    alert("Could not update appointment.");
-  }
-};
   // =========================
+  // UPDATE STATUS
+  // =========================
+  const updateStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("adminToken");
 
+      const response = await fetch(
+        `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            status,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to update appointment"
+        );
+      }
+
+      setAppointments((currentAppointments) =>
+        currentAppointments.map((appointment) =>
+          appointment._id === id
+            ? { ...appointment, status }
+            : appointment
+        )
+      );
+    } catch (error) {
+      console.error("Status update error:", error);
+      alert("Could not update appointment.");
+    }
+  };
+
+  // =========================
+  // APPROVE
+  // =========================
   const approveAppointment = (id) => {
     updateStatus(id, "Approved");
   };
@@ -109,7 +108,6 @@ const updateStatus = async (id, status) => {
   // =========================
   // REJECT
   // =========================
-
   const rejectAppointment = (id) => {
     updateStatus(id, "Rejected");
   };
@@ -117,7 +115,6 @@ const updateStatus = async (id, status) => {
   // =========================
   // DELETE
   // =========================
-
   const deleteAppointment = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this appointment?"
@@ -131,7 +128,7 @@ const updateStatus = async (id, status) => {
       const token = localStorage.getItem("adminToken");
 
       const response = await fetch(
-        "https://medicare-website-vzf1.onrender.com/appointments/${id}`,
+        `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -148,7 +145,6 @@ const updateStatus = async (id, status) => {
         );
       }
 
-      // Remove appointment from screen
       setAppointments((currentAppointments) =>
         currentAppointments.filter(
           (appointment) => appointment._id !== id
@@ -163,7 +159,6 @@ const updateStatus = async (id, status) => {
   // =========================
   // LOGOUT
   // =========================
-
   const logout = () => {
     localStorage.removeItem("adminToken");
     window.location.href = "/admin";
@@ -172,15 +167,14 @@ const updateStatus = async (id, status) => {
   // =========================
   // LOAD DATA
   // =========================
-
   useEffect(() => {
-  console.log("ADMIN PAGE LOADED");
-  fetchAppointments();
-}, []);
+    console.log("ADMIN PAGE LOADED");
+    fetchAppointments();
+  }, []);
+
   // =========================
   // COUNTS
   // =========================
-
   const totalAppointments = appointments.length;
 
   const pendingAppointments = appointments.filter(
@@ -200,7 +194,6 @@ const updateStatus = async (id, status) => {
   // =========================
   // STATUS CLASS
   // =========================
-
   const getStatusClass = (status) => {
     if (status === "Approved") {
       return "status-approved";
@@ -217,16 +210,11 @@ const updateStatus = async (id, status) => {
     <section className="admin-page">
       <div className="admin-container">
 
-        {/* =========================
-            HEADER
-        ========================= */}
-
+        {/* HEADER */}
         <div className="admin-header">
           <div>
             <p className="small-title">MEDICARE ADMIN</p>
-
             <h1>Appointment Dashboard</h1>
-
             <p>
               Manage all appointment requests from your patients.
             </p>
@@ -249,10 +237,7 @@ const updateStatus = async (id, status) => {
           </div>
         </div>
 
-        {/* =========================
-            STATISTICS
-        ========================= */}
-
+        {/* STATISTICS */}
         <div className="admin-stats">
 
           <div className="admin-stat-card">
@@ -301,30 +286,21 @@ const updateStatus = async (id, status) => {
 
         </div>
 
-        {/* =========================
-            LOADING
-        ========================= */}
-
+        {/* LOADING */}
         {loading && (
           <p className="admin-message">
             Loading appointments...
           </p>
         )}
 
-        {/* =========================
-            ERROR
-        ========================= */}
-
+        {/* ERROR */}
         {error && (
           <p className="admin-error">
             ❌ {error}
           </p>
         )}
 
-        {/* =========================
-            NO APPOINTMENTS
-        ========================= */}
-
+        {/* NO APPOINTMENTS */}
         {!loading &&
           !error &&
           appointments.length === 0 && (
@@ -333,15 +309,11 @@ const updateStatus = async (id, status) => {
             </p>
           )}
 
-        {/* =========================
-            APPOINTMENTS TABLE
-        ========================= */}
-
+        {/* APPOINTMENTS TABLE */}
         {!loading &&
           !error &&
           appointments.length > 0 && (
             <div className="appointments-table-wrapper">
-
               <table className="appointments-table">
 
                 <thead>
@@ -358,24 +330,18 @@ const updateStatus = async (id, status) => {
                 </thead>
 
                 <tbody>
-
                   {appointments.map((appointment) => {
-
                     const status =
                       appointment.status || "Pending";
 
                     return (
                       <tr key={appointment._id}>
 
-                        {/* PATIENT */}
-
                         <td>
                           <strong>
                             {appointment.name}
                           </strong>
                         </td>
-
-                        {/* CONTACT */}
 
                         <td>
                           <div>
@@ -387,31 +353,21 @@ const updateStatus = async (id, status) => {
                           </small>
                         </td>
 
-                        {/* DOCTOR */}
-
                         <td>
                           {appointment.doctor}
                         </td>
-
-                        {/* DATE */}
 
                         <td>
                           {appointment.date}
                         </td>
 
-                        {/* TIME */}
-
                         <td>
                           {appointment.time}
                         </td>
 
-                        {/* MESSAGE */}
-
                         <td>
                           {appointment.message || "—"}
                         </td>
-
-                        {/* STATUS */}
 
                         <td>
                           <span
@@ -422,8 +378,6 @@ const updateStatus = async (id, status) => {
                             {status}
                           </span>
                         </td>
-
-                        {/* ACTIONS */}
 
                         <td>
                           <div className="appointment-actions">
@@ -473,11 +427,9 @@ const updateStatus = async (id, status) => {
                       </tr>
                     );
                   })}
-
                 </tbody>
 
               </table>
-
             </div>
           )}
 
