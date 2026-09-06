@@ -25,7 +25,7 @@ const fetchAppointments = async () => {
     }
 
     const response = await fetch(
-      "http://localhost:5000/appointments",
+      "https://medicare-website-vzf1.onrender.com/appointments",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const updateStatus = async (id, status) => {
     const token = localStorage.getItem("adminToken");
 
     const response = await fetch(
-      `http://localhost:5000/appointments/${id}`,
+      `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
       {
         method: "PUT",
         headers: {
@@ -131,7 +131,7 @@ const updateStatus = async (id, status) => {
       const token = localStorage.getItem("adminToken");
 
       const response = await fetch(
-        `http://localhost:5000/appointments/${id}`,
+        `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
         {
           method: "DELETE",
           headers: {
