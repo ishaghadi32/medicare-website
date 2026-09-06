@@ -384,7 +384,10 @@ const logout = () => {
 
             <button
               className="admin-logout-btn"
-              onClick={logout}
+             onClick={() => {
+  alert("LOGOUT BUTTON CLICKED");
+  logout();
+}}
             >
               🚪 Logout
             </button>
