@@ -1,15 +1,78 @@
 import { useEffect, useState } from "react";
 
 function Admin() {
+  // =========================
+  // LOGIN STATES
+  // =========================
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("adminToken")
+  );
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  // =========================
+  // APPOINTMENT STATES
+  // =========================
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   // =========================
+  // ADMIN LOGIN
+  // =========================
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoginLoading(true);
+      setLoginError("");
+
+      const response = await fetch(
+        "https://medicare-website-vzf1.onrender.com/admin/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Invalid username or password"
+        );
+      }
+
+      localStorage.setItem("adminToken", data.token);
+
+      setIsLoggedIn(true);
+
+      setUsername("");
+      setPassword("");
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError(
+        error.message || "Login failed. Please try again."
+      );
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  // =========================
   // FETCH APPOINTMENTS
   // =========================
   const fetchAppointments = async () => {
-    console.log("FETCH APPOINTMENTS CALLED");
+    console.log("REFRESH BUTTON / FETCH APPOINTMENTS CALLED");
 
     try {
       setLoading(true);
@@ -19,6 +82,7 @@ function Admin() {
 
       if (!token) {
         setLoading(false);
+        setIsLoggedIn(false);
         return;
       }
 
@@ -35,7 +99,8 @@ function Admin() {
 
       if (response.status === 401) {
         localStorage.removeItem("adminToken");
-        window.location.href = "/admin";
+        setIsLoggedIn(false);
+        setLoading(false);
         return;
       }
 
@@ -161,16 +226,21 @@ function Admin() {
   // =========================
   const logout = () => {
     localStorage.removeItem("adminToken");
-    window.location.href = "/admin";
+    setAppointments([]);
+    setIsLoggedIn(false);
   };
 
   // =========================
-  // LOAD DATA
+  // LOAD APPOINTMENTS
   // =========================
   useEffect(() => {
-    console.log("ADMIN PAGE LOADED");
-    fetchAppointments();
-  }, []);
+    if (isLoggedIn) {
+      console.log("ADMIN PAGE LOADED");
+      fetchAppointments();
+    } else {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
 
   // =========================
   // COUNTS
@@ -206,6 +276,84 @@ function Admin() {
     return "status-pending";
   };
 
+  // =========================
+  // ADMIN LOGIN PAGE
+  // =========================
+  if (!isLoggedIn) {
+    return (
+      <section className="admin-login-page">
+        <div className="admin-login-card">
+
+          <div className="admin-login-icon">
+            🔐
+          </div>
+
+          <h1>Admin Login</h1>
+
+          <p className="admin-login-subtitle">
+            Sign in to access the MediCare appointment dashboard.
+          </p>
+
+          {loginError && (
+            <div className="admin-login-error">
+              {loginError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+
+            <div className="admin-input-group">
+              <label>Username</label>
+
+              <input
+                type="text"
+                placeholder="Enter admin username"
+                value={username}
+                onChange={(e) =>
+                  setUsername(e.target.value)
+                }
+                required
+              />
+            </div>
+
+            <div className="admin-input-group">
+              <label>Password</label>
+
+              <input
+                type="password"
+                placeholder="Enter admin password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="admin-login-btn"
+              disabled={loginLoading}
+            >
+              {loginLoading
+                ? "Logging in..."
+                : "Login to Dashboard"}
+            </button>
+
+          </form>
+
+          <p className="admin-login-note">
+            MediCare Administration Portal
+          </p>
+
+        </div>
+      </section>
+    );
+  }
+
+  // =========================
+  // ADMIN DASHBOARD
+  // =========================
   return (
     <section className="admin-page">
       <div className="admin-container">
@@ -214,13 +362,16 @@ function Admin() {
         <div className="admin-header">
           <div>
             <p className="small-title">MEDICARE ADMIN</p>
+
             <h1>Appointment Dashboard</h1>
+
             <p>
               Manage all appointment requests from your patients.
             </p>
           </div>
 
           <div className="admin-header-buttons">
+
             <button
               className="admin-refresh-btn"
               onClick={fetchAppointments}
@@ -234,6 +385,7 @@ function Admin() {
             >
               🚪 Logout
             </button>
+
           </div>
         </div>
 
@@ -314,6 +466,7 @@ function Admin() {
           !error &&
           appointments.length > 0 && (
             <div className="appointments-table-wrapper">
+
               <table className="appointments-table">
 
                 <thead>
@@ -430,6 +583,7 @@ function Admin() {
                 </tbody>
 
               </table>
+
             </div>
           )}
 
