@@ -224,12 +224,15 @@ function Admin() {
   // =========================
   // LOGOUT
   // =========================
-  const logout = () => {
-    localStorage.removeItem("adminToken");
-    setAppointments([]);
-    setIsLoggedIn(false);
-  };
+const logout = () => {
+  console.log("LOGOUT BUTTON CLICKED");
 
+  localStorage.removeItem("adminToken");
+
+  setIsLoggedIn(false);
+
+  console.log("LOGGED OUT SUCCESSFULLY");
+};
   // =========================
   // LOAD APPOINTMENTS
   // =========================
