@@ -428,13 +428,23 @@ function Admin() {
               🔄 Refresh
             </button>
 
-            <button
-              type="button"
-              className="admin-logout-btn"
-              onClick={logout}
-            >
-              🚪 Logout
-            </button>
+           <button
+  type="button"
+  className="admin-logout-btn"
+  onMouseDown={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    localStorage.removeItem("adminToken");
+    setAppointments([]);
+    setError("");
+    setIsLoggedIn(false);
+
+    console.log("LOGOUT WORKED");
+  }}
+>
+  🚪 Logout
+</button>
 
           </div>
         </div>
