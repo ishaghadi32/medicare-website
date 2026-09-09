@@ -428,19 +428,21 @@ function Admin() {
               🔄 Refresh
             </button>
 
-           <button
+         <button
   type="button"
   className="admin-logout-btn"
-  onMouseDown={(e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  onClick={() => {
+    console.log("LOGOUT CLICKED");
 
     localStorage.removeItem("adminToken");
+
     setAppointments([]);
     setError("");
+    setLoginError("");
+    setLoading(false);
     setIsLoggedIn(false);
 
-    console.log("LOGOUT WORKED");
+    console.log("LOGOUT SUCCESS");
   }}
 >
   🚪 Logout
