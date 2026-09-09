@@ -55,11 +55,11 @@ function Admin() {
       localStorage.setItem("adminToken", data.token);
 
       setIsLoggedIn(true);
-
       setUsername("");
       setPassword("");
     } catch (error) {
       console.error("Login error:", error);
+
       setLoginError(
         error.message || "Login failed. Please try again."
       );
@@ -81,6 +81,7 @@ function Admin() {
       const token = localStorage.getItem("adminToken");
 
       if (!token) {
+        setAppointments([]);
         setLoading(false);
         setIsLoggedIn(false);
         return;
@@ -99,6 +100,7 @@ function Admin() {
 
       if (response.status === 401) {
         localStorage.removeItem("adminToken");
+        setAppointments([]);
         setIsLoggedIn(false);
         setLoading(false);
         return;
@@ -128,6 +130,11 @@ function Admin() {
     try {
       const token = localStorage.getItem("adminToken");
 
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+
       const response = await fetch(
         `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
         {
@@ -143,6 +150,13 @@ function Admin() {
       );
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("adminToken");
+        setAppointments([]);
+        setIsLoggedIn(false);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(
@@ -192,6 +206,11 @@ function Admin() {
     try {
       const token = localStorage.getItem("adminToken");
 
+      if (!token) {
+        setIsLoggedIn(false);
+        return;
+      }
+
       const response = await fetch(
         `https://medicare-website-vzf1.onrender.com/appointments/${id}`,
         {
@@ -203,6 +222,13 @@ function Admin() {
       );
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        localStorage.removeItem("adminToken");
+        setAppointments([]);
+        setIsLoggedIn(false);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(
@@ -224,15 +250,29 @@ function Admin() {
   // =========================
   // LOGOUT
   // =========================
-const logout = () => {
-  console.log("LOGOUT BUTTON CLICKED");
+  const logout = () => {
+    console.log("LOGOUT BUTTON CLICKED");
 
-  localStorage.removeItem("adminToken");
+    // Remove admin login token
+    localStorage.removeItem("adminToken");
 
-  setIsLoggedIn(false);
+    // Clear dashboard data
+    setAppointments([]);
 
-  console.log("LOGGED OUT SUCCESSFULLY");
-};
+    // Clear errors
+    setError("");
+    setLoginError("");
+
+    // Stop loading
+    setLoading(false);
+
+    // Go back to Admin Login
+    setIsLoggedIn(false);
+
+    console.log("ADMIN TOKEN REMOVED");
+    console.log("LOGGED OUT SUCCESSFULLY");
+  };
+
   // =========================
   // LOAD APPOINTMENTS
   // =========================
@@ -363,10 +403,15 @@ const logout = () => {
 
         {/* HEADER */}
         <div className="admin-header">
-          <div>
-            <p className="small-title">MEDICARE ADMIN</p>
 
-            <h1>Appointment Dashboard</h1>
+          <div>
+            <p className="small-title">
+              MEDICARE ADMIN
+            </p>
+
+            <h1>
+              Appointment Dashboard
+            </h1>
 
             <p>
               Manage all appointment requests from your patients.
@@ -376,6 +421,7 @@ const logout = () => {
           <div className="admin-header-buttons">
 
             <button
+              type="button"
               className="admin-refresh-btn"
               onClick={fetchAppointments}
             >
@@ -383,11 +429,9 @@ const logout = () => {
             </button>
 
             <button
+              type="button"
               className="admin-logout-btn"
-             onClick={() => {
-  alert("LOGOUT BUTTON CLICKED");
-  logout();
-}}
+              onClick={logout}
             >
               🚪 Logout
             </button>
@@ -542,6 +586,7 @@ const logout = () => {
                           <div className="appointment-actions">
 
                             <button
+                              type="button"
                               className="approve-btn"
                               onClick={() =>
                                 approveAppointment(
@@ -556,6 +601,7 @@ const logout = () => {
                             </button>
 
                             <button
+                              type="button"
                               className="reject-btn"
                               onClick={() =>
                                 rejectAppointment(
@@ -570,6 +616,7 @@ const logout = () => {
                             </button>
 
                             <button
+                              type="button"
                               className="delete-btn"
                               onClick={() =>
                                 deleteAppointment(
